@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Camo Cursor - Meditative Glitch Art Drawing</title>
+  <link rel="shortcut icon" href="favicon.ico" />
+  <meta property="og:image" content="http://qubodup.github.com/camocursor/preview.png" />
+<style type="text/css">
+html, body {
+  background-color: #333;
+  color: #eee;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+canvas {
+  background-color: #333;
+  color: #eee;
+  cursor: url('cursor.png');
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+</style>
+<script>
+  function writeMessage(canvas, message) {
+    var context = canvas.getContext('2d');
+    //context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#eee';
+    context.fillText(message, 10, 25);
+  }
+  function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect(), root = document.documentElement;
+
+    // return relative mouse position
+    var mouseX = evt.clientX - rect.top - root.scrollTop;
+    var mouseY = evt.clientY - rect.left - root.scrollLeft;
+    return {
+      x: mouseX,
+      y: mouseY
+    };
+  }
+
+  window.onload = function() {
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    var cursor = new Image();
+    cursor.src = './cursor.png'
+
+    // mouse event listener
+    // http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
+    canvas.addEventListener('mousemove', function(evt) {
+      var mousePos = getMousePos(canvas, evt);
+
+      // complain
+      /*if ((mousePos.x == window.innerWidth) || (mousePos.x == 0) || (mousePos.y == window.innerHeight) || (mousePos.y == 0)) {
+        var message = "\nI wish JavaScript would allow me to move the cursor";
+        writeMessage(canvas, message);
+      }*/
+
+      // draw cursors
+      // http://www.html5canvastutorials.com/tutorials/html5-canvas-images/
+      context.drawImage(cursor, mousePos.x, mousePos.y)
+      for (var i = 0; i < fakes.length; i++) {
+        context.drawImage(cursor, (fakes[i][0] + mousePos.x * fakes[i][2]) % window.innerWidth, (fakes[i][1] + mousePos.y * fakes[i][2]) % window.innerHeight)
+      }
+    }, false);
+
+    // resize the canvas to fill browser window dynamically
+    // http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
+    window.addEventListener('resize', resizeCanvas, false);
+
+    function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            /**
+             * Your drawings need to be inside this function otherwise they will be reset when 
+             * you resize the browser window and the canvas goes will be cleared.
+             */
+             setPositions();
+    }
+    resizeCanvas();
+    
+    function setPositions() {
+      // generate list of fake cursors
+      // http://stackoverflow.com/questions/3010840/loop-through-array-in-javascript
+      fakes = new Array(500);
+      for (var i = 0; i < 500; i++) {
+        fakes[i] = new Array(3)
+        fakes[i][0] = Math.floor(Math.random()*window.innerWidth)
+        fakes[i][1] = Math.floor(Math.random()*window.innerHeight)
+        fakes[i][2] = Math.random()/5 + 0.90
+      }
+    }
+
+  };
+</script>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+</html>
